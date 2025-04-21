@@ -1,0 +1,10 @@
+D:\NAM2\NAM2_HK2\WINFORM\Midterm_project1\PaintBasic\bin\Debug\PaintBasic.exe.config
+D:\NAM2\NAM2_HK2\WINFORM\Midterm_project1\PaintBasic\bin\Debug\PaintBasic.exe
+D:\NAM2\NAM2_HK2\WINFORM\Midterm_project1\PaintBasic\bin\Debug\PaintBasic.pdb
+D:\NAM2\NAM2_HK2\WINFORM\Midterm_project1\PaintBasic\obj\Debug\PaintBasic.csproj.AssemblyReference.cache
+D:\NAM2\NAM2_HK2\WINFORM\Midterm_project1\PaintBasic\obj\Debug\PaintBasic.Properties.Resources.resources
+D:\NAM2\NAM2_HK2\WINFORM\Midterm_project1\PaintBasic\obj\Debug\PaintBasic.csproj.GenerateResource.cache
+D:\NAM2\NAM2_HK2\WINFORM\Midterm_project1\PaintBasic\obj\Debug\PaintBasic.csproj.CoreCompileInputs.cache
+D:\NAM2\NAM2_HK2\WINFORM\Midterm_project1\PaintBasic\obj\Debug\PaintBasic.exe
+D:\NAM2\NAM2_HK2\WINFORM\Midterm_project1\PaintBasic\obj\Debug\PaintBasic.pdb
+D:\NAM2\NAM2_HK2\WINFORM\Midterm_project1\PaintBasic\obj\Debug\PaintBasic.Paint.resources
