@@ -22,7 +22,7 @@ namespace PaintBasic
         Color brushStrokeColor = Color.White;
         HatchStyle? mySelectedStyle = null;
 
-        Bitmap bm;
+        Bitmap myBitmap;
 
         List<clsDrawObject> lstObject = new List<clsDrawObject>();
 
@@ -50,8 +50,8 @@ namespace PaintBasic
             ChooseLineColor.BackColor = brushStrokeColor;
             penStyle = DashStyle.Solid;
 
-            bm = new Bitmap(PlMain.Width, PlMain.Height);
-            gp = Graphics.FromImage(bm);
+            myBitmap = new Bitmap(PlMain.Width, PlMain.Height);
+            gp = Graphics.FromImage(myBitmap);
             gp.Clear(Color.White);
         }
         // Lớp con sử dụng tính đa hình
@@ -278,6 +278,86 @@ namespace PaintBasic
                 for (int i = 0; i < Points.Count; i++)
                 {
                     Points[i] = new Point(Points[i].X + dx, Points[i].Y + dy);
+                }
+            }
+            public override void Resize(Point newPoint, int resizePoint)
+            {
+                // Tính toán khung bao (bounding box) của đa giác
+                int minX = int.MaxValue, minY = int.MaxValue;
+                int maxX = int.MinValue, maxY = int.MinValue;
+
+                foreach (var point in Points)
+                {
+                    minX = Math.Min(minX, point.X);
+                    minY = Math.Min(minY, point.Y);
+                    maxX = Math.Max(maxX, point.X);
+                    maxY = Math.Max(maxY, point.Y);
+                }
+
+                int oldWidth = maxX - minX;
+                int oldHeight = maxY - minY;
+
+                if (oldWidth <= 0 || oldHeight <= 0) return; // Tránh chia cho 0
+
+                // Xác định điểm mới của khung bao
+                Point newP1 = new Point(minX, minY); // Top-left
+                Point newP2 = new Point(maxX, maxY); // Bottom-right
+
+                if (resizePoint == 1) // Resize từ góc trên-trái
+                    newP1 = newPoint;
+                else if (resizePoint == 2) // Resize từ góc dưới-phải
+                    newP2 = newPoint;
+
+                // Tính toán kích thước khung bao mới
+                int newMinX = Math.Min(newP1.X, newP2.X);
+                int newMinY = Math.Min(newP1.Y, newP2.Y);
+                int newWidth = Math.Abs(newP2.X - newP1.X);
+                int newHeight = Math.Abs(newP2.Y - newP1.Y);
+
+                if (newWidth <= 5 || newHeight <= 5) return; // Đảm bảo kích thước tối thiểu
+
+                // Tính tỷ lệ co giãn
+                float scaleX = (float)newWidth / oldWidth;
+                float scaleY = (float)newHeight / oldHeight;
+
+                // Cập nhật vị trí các điểm
+                for (int i = 0; i < Points.Count; i++)
+                {
+                    int newX = newMinX + (int)((Points[i].X - minX) * scaleX);
+                    int newY = newMinY + (int)((Points[i].Y - minY) * scaleY);
+                    Points[i] = new Point(newX, newY);
+                }
+
+                // Cập nhật p1 và p2 để đồng bộ với lớp cha
+                p1 = new Point(newMinX, newMinY);
+                p2 = new Point(newMinX + newWidth, newMinY + newHeight);
+            }
+            public override void DrawSelection(Graphics myGp)
+            {
+                if (Selected && Points.Count > 0)
+                {
+                    // Tính toán khung bao
+                    int minX = int.MaxValue, minY = int.MaxValue;
+                    int maxX = int.MinValue, maxY = int.MinValue;
+
+                    foreach (var point in Points)
+                    {
+                        minX = Math.Min(minX, point.X);
+                        minY = Math.Min(minY, point.Y);
+                        maxX = Math.Max(maxX, point.X);
+                        maxY = Math.Max(maxY, point.Y);
+                    }
+
+                    Rectangle boundingRect = new Rectangle(minX, minY, maxX - minX, maxY - minY);
+
+                    // Vẽ khung chọn
+                    Pen selectionPen = new Pen(Color.Gray, 1) { DashStyle = DashStyle.Dash };
+                    myGp.DrawRectangle(selectionPen, boundingRect);
+
+                    // Vẽ các điểm điều khiển
+                    Brush handleBrush = Brushes.Black;
+                    myGp.FillRectangle(handleBrush, boundingRect.Left - 3, boundingRect.Top - 3, 6, 6); // Top-left
+                    myGp.FillRectangle(handleBrush, boundingRect.Right - 3, boundingRect.Bottom - 3, 6, 6); // Bottom-right
                 }
             }
         }
@@ -759,6 +839,15 @@ namespace PaintBasic
                 if (currentPolygon == null || currentPolygon.IsClosed)
                 {
                     currentPolygon = new clsPolygon();
+                    currentPolygon.myPen = new Pen(mycolor, myThickness) { DashStyle = penStyle };
+                    if (mySelectedStyle.HasValue)
+                    {
+                        currentPolygon.myBrush = new HatchBrush(mySelectedStyle.Value, brushFillColor, brushStrokeColor);
+                    }
+                    else
+                    {
+                        currentPolygon.myBrush = new SolidBrush(brushFillColor);
+                    }
                     lstObject.Add(currentPolygon);
                 }
 
@@ -842,7 +931,7 @@ namespace PaintBasic
                 else if (index == 6)
                     myCurrentObject = new clsCurve(e.Location, e.Location, e.Location);
                 else if (index == 7)
-                    myCurrentObject = new clsPolygon();
+                    myCurrentObject = null; 
 
                 if (myCurrentObject != null)
                 {
@@ -868,7 +957,7 @@ namespace PaintBasic
 
         private void PlMain_Paint(object sender, PaintEventArgs e)
         {
-            e.Graphics.DrawImage(bm, 0, 0);
+            e.Graphics.DrawImage(myBitmap, 0, 0);
 
             // Vẽ các đối tượng và lựa chọn
             foreach (var obj in lstObject)
@@ -885,8 +974,6 @@ namespace PaintBasic
             {
                 myCurrentObject.Draw(e.Graphics);
             }
-        }
-
-        
+        }       
     }
 }
