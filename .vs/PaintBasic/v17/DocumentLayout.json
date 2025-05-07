@@ -3,16 +3,16 @@
   "WorkspaceRootPath": "D:\\NAM2\\NAM2_HK2\\WINFORM\\Midterm_project1\\PaintBasic\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{5C1FEBE8-C8A8-43E6-8AA6-27A2EF1B3C1B}|PaintBasic.csproj|D:\\NAM2\\NAM2_HK2\\WINFORM\\Midterm_project1\\PaintBasic\\form1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{5C1FEBE8-C8A8-43E6-8AA6-27A2EF1B3C1B}|PaintBasic.csproj|solutionrelative:form1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\NAM2\\NAM2_HK2\\WINFORM\\Midterm_project1\\PaintBasic\\Form1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:Form1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{5C1FEBE8-C8A8-43E6-8AA6-27A2EF1B3C1B}|PaintBasic.csproj|d:\\nam2\\nam2_hk2\\winform\\midterm_project1\\paintbasic\\form1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form",
-      "RelativeMoniker": "D:0:0:{5C1FEBE8-C8A8-43E6-8AA6-27A2EF1B3C1B}|PaintBasic.csproj|solutionrelative:form1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form"
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\NAM2\\NAM2_HK2\\WINFORM\\Midterm_project1\\PaintBasic\\Program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:Program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{5C1FEBE8-C8A8-43E6-8AA6-27A2EF1B3C1B}|PaintBasic.csproj|D:\\NAM2\\NAM2_HK2\\WINFORM\\Midterm_project1\\PaintBasic\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{5C1FEBE8-C8A8-43E6-8AA6-27A2EF1B3C1B}|PaintBasic.csproj|solutionrelative:program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\NAM2\\NAM2_HK2\\WINFORM\\Midterm_project1\\PaintBasic\\form1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:form1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form"
     }
   ],
   "DocumentGroupContainers": [
@@ -66,7 +66,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 1,
               "Title": "Program.cs",
               "DocumentMoniker": "D:\\NAM2\\NAM2_HK2\\WINFORM\\Midterm_project1\\PaintBasic\\Program.cs",
               "RelativeDocumentMoniker": "Program.cs",
@@ -74,8 +74,7 @@
               "RelativeToolTip": "Program.cs",
               "ViewState": "AQIAAAAAAAAAAAAAAAAuwBMAAAAJAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-04-20T19:43:37.746Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-04-20T19:43:37.746Z"
             },
             {
               "$type": "Document",
@@ -85,22 +84,21 @@
               "RelativeDocumentMoniker": "Form1.cs",
               "ToolTip": "D:\\NAM2\\NAM2_HK2\\WINFORM\\Midterm_project1\\PaintBasic\\Form1.cs",
               "RelativeToolTip": "Form1.cs",
-              "ViewState": "AQIAAAAAAAAAAAAAAAAAAG0BAAAtAAAA",
+              "ViewState": "AQIAAJUDAAAAAAAAAAAswKIDAAAfAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-04-20T16:08:47.803Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 2,
               "Title": "Form1.cs [Design]",
               "DocumentMoniker": "D:\\NAM2\\NAM2_HK2\\WINFORM\\Midterm_project1\\PaintBasic\\Form1.cs",
               "RelativeDocumentMoniker": "Form1.cs",
               "ToolTip": "D:\\NAM2\\NAM2_HK2\\WINFORM\\Midterm_project1\\PaintBasic\\Form1.cs [Design]",
               "RelativeToolTip": "Form1.cs [Design]",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-04-19T17:10:12.376Z",
-              "EditorCaption": " [Design]"
+              "WhenOpened": "2025-04-19T17:10:12.376Z"
             }
           ]
         }

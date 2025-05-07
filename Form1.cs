@@ -10,14 +10,11 @@ namespace PaintBasic
     public partial class Paint : Form
     {
         Graphics gp;
-
-        Color mycolor = Color.Blue;
-        int myThickness;
+        int myThickness = 1;
         DashStyle penStyle;
-
+        Color mycolor = Color.Blue;
         ColorDialog myColorDialog = new ColorDialog();
         Color newColor;
-
         Color brushFillColor = Color.Transparent;
         Color brushStrokeColor = Color.White;
         HatchStyle? mySelectedStyle = null;
@@ -54,7 +51,6 @@ namespace PaintBasic
             gp = Graphics.FromImage(myBitmap);
             gp.Clear(Color.White);
         }
-        // Lớp con sử dụng tính đa hình
         public abstract class clsDrawObject
         {
             public Point p1;
@@ -81,46 +77,58 @@ namespace PaintBasic
 
             public virtual void Resize(Point newPoint, int resizePoint)
             {
-                if (resizePoint == 1)
-                    p1 = newPoint;
-                else if (resizePoint == 2)
-                    p2 = newPoint;
+                switch (resizePoint)
+                {
+                    case 1:
+                        p1 = newPoint;
+                        break;
+                    case 2:
+                        p2 = newPoint;
+                        break;
+                }
 
-                if (Math.Abs(p2.X - p1.X) < 5)
-                    p2.X = p1.X + 5;
-                if (Math.Abs(p2.Y - p1.Y) < 5)
-                    p2.Y = p1.Y + 5;
+                int width = Math.Abs(p2.X - p1.X);
+                int height = Math.Abs(p2.Y - p1.Y);
+
+                if (width < 5)
+                    p2.X = p1.X + 5 * Math.Sign(p2.X - p1.X == 0 ? 1 : p2.X - p1.X);
+
+                if (height < 5)
+                    p2.Y = p1.Y + 5 * Math.Sign(p2.Y - p1.Y == 0 ? 1 : p2.Y - p1.Y);
             }
 
-            public virtual void Move(int dx, int dy)
+            public virtual void Move(int new_x, int new_y)
             {
-                p1.X += dx;
-                p1.Y += dy;
-                p2.X += dx;
-                p2.Y += dy;
+                p1.X += new_x;
+                p1.Y += new_y;
+                p2.X += new_x;
+                p2.Y += new_y;
             }
 
             public virtual void DrawSelection(Graphics myGp)
             {
-                if (Selected)
+                if (!Selected) return;
+                using (Pen selectionPen = new Pen(Color.Black, 1))
                 {
-                    Pen selectionPen = new Pen(Color.Black, 1)
-                    { DashStyle = System.Drawing.Drawing2D.DashStyle.Dash };
+                    selectionPen.DashStyle = DashStyle.Dash;
+                    int left = Math.Min(p1.X, p2.X);
+                    int top = Math.Min(p1.Y, p2.Y);
+                    int width = Math.Abs(p2.X - p1.X);
+                    int height = Math.Abs(p2.Y - p1.Y);
+                    Rectangle bounds = new Rectangle(left, top, width, height);
 
-                    Rectangle rect = new Rectangle(
-                        Math.Min(p1.X, p2.X),
-                        Math.Min(p1.Y, p2.Y),
-                        Math.Abs(p2.X - p1.X),
-                        Math.Abs(p2.Y - p1.Y));
-
-                    myGp.DrawRectangle(selectionPen, rect);
-
+                    myGp.DrawRectangle(selectionPen, bounds);
+                    int handleSize = 5;
+                    int offset = handleSize / 2;
                     Brush handleBrush = Brushes.Black;
-                    myGp.FillRectangle(handleBrush, rect.Left - 3, rect.Top - 3, 5, 5);
-                    myGp.FillRectangle(handleBrush, rect.Right - 3, rect.Bottom - 3, 5, 5);
+
+                    myGp.FillRectangle(handleBrush, bounds.Left - offset, bounds.Top - offset, handleSize, handleSize);
+                    myGp.FillRectangle(handleBrush, bounds.Right - offset, bounds.Bottom - offset, handleSize, handleSize);
                 }
             }
+
         }
+        // Lớp con sử dụng tính đa hình
         public class clsLine : clsDrawObject
         {
             public override void Draw(Graphics myGp)
@@ -406,10 +414,9 @@ namespace PaintBasic
                 }
             }
 
-            // Chỉnh sửa để hỗ trợ resize nhóm
             public override void Resize(Point newPoint, int resizePoint)
             {
-                UpdateBoundingBox(); // Đảm bảo boundingRect chính xác
+                UpdateBoundingBox(); 
 
                 int oldMinX = boundingRect.Left;
                 int oldMinY = boundingRect.Top;
@@ -494,24 +501,19 @@ namespace PaintBasic
         // Pen Properties
         private void Pen_Style_SelectedIndexChanged(object sender, EventArgs e)
         {
-            switch (Pen_Style.SelectedItem.ToString())
-            {
-                case "Solid":
-                    penStyle = DashStyle.Solid;
-                    break;
-                case "Dash":
-                    penStyle = DashStyle.Dash;
-                    break;
-                case "Dot":
-                    penStyle = DashStyle.Dot;
-                    break;
-                case "DashDot":
-                    penStyle = DashStyle.DashDot;
-                    break;
-                case "DashDotDot":
-                    penStyle = DashStyle.DashDotDot;
-                    break;
-            }
+            string selected = Pen_Style.SelectedItem.ToString();
+
+            if (selected == "Solid")
+                penStyle = DashStyle.Solid;
+            else if (selected == "Dash")
+                penStyle = DashStyle.Dash;
+            else if (selected == "Dot")
+                penStyle = DashStyle.Dot;
+            else if (selected == "DashDot")
+                penStyle = DashStyle.DashDot;
+            else if (selected == "DashDotDot")
+                penStyle = DashStyle.DashDotDot;
+
             this.PlMain.Invalidate();
         }
         private void ChoosePenColor_Click(object sender, EventArgs e)
@@ -529,25 +531,18 @@ namespace PaintBasic
         // Brush Properties
         private void ChooseBrushColor_Click(object sender, EventArgs e)
         {
-            if (myColorDialog.ShowDialog() == DialogResult.OK)
-            {
-                brushFillColor = myColorDialog.Color;
-                ChooseBrushColor.BackColor = brushFillColor;
+            if (myColorDialog.ShowDialog() != DialogResult.OK) return;
 
-                if (selectedObject != null)
-                {
-                    if (mySelectedStyle.HasValue)
-                    {
-                        selectedObject.myBrush = new HatchBrush(mySelectedStyle.Value, brushFillColor, brushStrokeColor);
-                    }
-                    else
-                    {
-                        selectedObject.myBrush = new SolidBrush(brushFillColor);
-                    }
+            brushFillColor = myColorDialog.Color;
+            ChooseBrushColor.BackColor = brushFillColor;
 
-                    this.PlMain.Invalidate(); // Làm mới giao diện
-                }
-            }
+            if (selectedObject == null) return;
+
+            selectedObject.myBrush = mySelectedStyle.HasValue
+                ? new HatchBrush(mySelectedStyle.Value, brushFillColor, brushStrokeColor)
+                : new SolidBrush(brushFillColor);
+
+            this.PlMain.Invalidate(); // Làm mới giao diện
         }
         private void ChooseLineColor_Click(object sender, EventArgs e)
         {
@@ -861,12 +856,10 @@ namespace PaintBasic
             isPress = true;
             startPoint = e.Location;
 
-            if (e.Button == MouseButtons.Right || btnSelect == false)
+            if (e.Button == MouseButtons.Right || !btnSelect)
             {
                 foreach (var obj in lstObject)
-                {
                     obj.Selected = false;
-                }
             }
 
             if (Control.ModifierKeys == Keys.Control)
@@ -876,83 +869,121 @@ namespace PaintBasic
                     if (obj.Contains(e.Location))
                     {
                         obj.Selected = !obj.Selected;
-                        this.PlMain.Invalidate();
+                        PlMain.Invalidate();
                         return;
                     }
                 }
             }
-            else
+
+            foreach (var obj in lstObject)
             {
-                foreach (var obj in lstObject)
+                if (obj.Contains(e.Location) && btnSelect)
                 {
-                    if (obj.Contains(e.Location) && btnSelect == true)
+                    foreach (var o in lstObject)
+                        o.Selected = false;
+
+                    obj.Selected = true;
+                    selectedObject = obj;
+
+                    // Kiểm tra resize
+                    if (Math.Abs(e.X - obj.p1.X) < 10 && Math.Abs(e.Y - obj.p1.Y) < 10)
                     {
-                        foreach (var o in lstObject)
-                            o.Selected = false;
-
-                        obj.Selected = true;
-                        selectedObject = obj;
-
-                        if (Math.Abs(e.X - obj.p1.X) < 10 && Math.Abs(e.Y - obj.p1.Y) < 10)
-                        {
-                            isResizing = true;
-                            resizePoint = 1;
-                            return;
-                        }
-                        else if (Math.Abs(e.X - obj.p2.X) < 10 && Math.Abs(e.Y - obj.p2.Y) < 10)
-                        {
-                            isResizing = true;
-                            resizePoint = 2;
-                            return;
-                        }
-                        else
-                        {
-                            isResizing = false;
-                        }
-
-                        this.PlMain.Invalidate();
-                        return;
+                        isResizing = true;
+                        resizePoint = 1;
                     }
-                }
-
-                selectedObject = null;
-                myCurrentObject = null;
-
-                if (index == 1)
-                    myCurrentObject = new clsLine();
-                else if (index == 2)
-                    myCurrentObject = new clsRectangle();
-                else if (index == 3)
-                    myCurrentObject = new clsEllipse();
-                else if (index == 4)
-                    myCurrentObject = new clsSquare();
-                else if (index == 5)
-                    myCurrentObject = new clsCircle();
-                else if (index == 6)
-                    myCurrentObject = new clsCurve(e.Location, e.Location, e.Location);
-                else if (index == 7)
-                    myCurrentObject = null; 
-
-                if (myCurrentObject != null)
-                {
-                    myCurrentObject.myPen.Color = mycolor;
-                    myCurrentObject.myPen.Width = myThickness;
-                    myCurrentObject.myPen.DashStyle = penStyle;
-
-                    if (mySelectedStyle.HasValue)
+                    else if (Math.Abs(e.X - obj.p2.X) < 10 && Math.Abs(e.Y - obj.p2.Y) < 10)
                     {
-                        myCurrentObject.myBrush = new HatchBrush(mySelectedStyle.Value, brushFillColor, brushStrokeColor);
+                        isResizing = true;
+                        resizePoint = 2;
                     }
                     else
                     {
-                        myCurrentObject.myBrush = new SolidBrush(brushFillColor);
+                        isResizing = false;
                     }
 
-                    myCurrentObject.p1 = e.Location;
-                    myCurrentObject.p2 = e.Location;
+                    PlMain.Invalidate();
+                    return;
                 }
             }
-            this.PlMain.Invalidate();
+
+            // Không chọn object nào thì tạo object mới
+            selectedObject = null;
+            myCurrentObject = null;
+
+            switch (index)
+            {
+                case 1: myCurrentObject = new clsLine(); break;
+                case 2: myCurrentObject = new clsRectangle(); break;
+                case 3: myCurrentObject = new clsEllipse(); break;
+                case 4: myCurrentObject = new clsSquare(); break;
+                case 5: myCurrentObject = new clsCircle(); break;
+                case 6: myCurrentObject = new clsCurve(e.Location, e.Location, e.Location); break;
+                default: myCurrentObject = null; break;
+            }
+
+            if (myCurrentObject != null)
+            {
+                myCurrentObject.myPen.Color = mycolor;
+                myCurrentObject.myPen.Width = myThickness;
+                myCurrentObject.myPen.DashStyle = penStyle;
+
+                myCurrentObject.myBrush = mySelectedStyle.HasValue
+                    ? new HatchBrush(mySelectedStyle.Value, brushFillColor, brushStrokeColor)
+                    : new SolidBrush(brushFillColor);
+
+                myCurrentObject.p1 = e.Location;
+                myCurrentObject.p2 = e.Location;
+            }
+
+            PlMain.Invalidate();
+
+        }
+
+        selectedObject = null;
+        myCurrentObject = null;
+
+        switch (index)
+        {
+            case 1:
+                myCurrentObject = new clsLine();
+                break;
+            case 2:
+                myCurrentObject = new clsRectangle();
+                break;
+            case 3:
+                myCurrentObject = new clsEllipse();
+                break;
+            case 4:
+                myCurrentObject = new clsSquare();
+                break;
+            case 5:
+                myCurrentObject = new clsCircle();
+                break;
+            case 6:
+                myCurrentObject = new clsCurve(e.Location, e.Location, e.Location);
+                break;
+            default:
+                myCurrentObject = null;
+                break;
+        }
+
+
+            if (myCurrentObject != null)
+            {
+                myCurrentObject.myPen.Color = mycolor;
+                myCurrentObject.myPen.Width = myThickness;
+                myCurrentObject.myPen.DashStyle = penStyle;
+
+                myCurrentObject.myBrush = mySelectedStyle.HasValue
+                    ? new HatchBrush(mySelectedStyle.Value, brushFillColor, brushStrokeColor)
+                    : new SolidBrush(brushFillColor);
+
+                myCurrentObject.p1 = e.Location;
+                myCurrentObject.p2 = e.Location;
+            }
+
+            PlMain.Invalidate();
+
         }
 
         private void PlMain_Paint(object sender, PaintEventArgs e)
