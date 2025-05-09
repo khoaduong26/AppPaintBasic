@@ -34,7 +34,6 @@ namespace PaintBasic
         int index;
         bool btnSelect = true;
         clsPolygon currentPolygon = null;
-        private object mySelectedObject;
 
         public Paint()
         {
@@ -429,9 +428,9 @@ namespace PaintBasic
                 Point newP2 = p2;
 
                 if (resizePoint == 1)
-                    newP1 = newPoint; // Top-left
+                    newP1 = newPoint; 
                 else if (resizePoint == 2)
-                    newP2 = newPoint; // Bottom-right
+                    newP2 = newPoint; 
                 else
                     return;
 
@@ -537,12 +536,21 @@ namespace PaintBasic
             ChooseBrushColor.BackColor = brushFillColor;
 
             if (selectedObject == null) return;
+            Brush newBrush;
 
-            selectedObject.myBrush = mySelectedStyle.HasValue
-                ? new HatchBrush(mySelectedStyle.Value, brushFillColor, brushStrokeColor)
-                : new SolidBrush(brushFillColor);
+            if (mySelectedStyle.HasValue)
+            {
+                newBrush = new HatchBrush(mySelectedStyle.Value, brushFillColor, brushStrokeColor);
+            }
+            else
+            {
+                newBrush = new SolidBrush(brushFillColor);
+            }
+
+            selectedObject.myBrush = newBrush;
 
             this.PlMain.Invalidate(); // Làm mới giao diện
+
         }
         private void ChooseLineColor_Click(object sender, EventArgs e)
         {
@@ -856,10 +864,12 @@ namespace PaintBasic
             isPress = true;
             startPoint = e.Location;
 
-            if (e.Button == MouseButtons.Right || !btnSelect)
+            if (e.Button == MouseButtons.Right || btnSelect == false)
             {
                 foreach (var obj in lstObject)
+                {
                     obj.Selected = false;
+                }
             }
 
             if (Control.ModifierKeys == Keys.Control)
@@ -869,122 +879,84 @@ namespace PaintBasic
                     if (obj.Contains(e.Location))
                     {
                         obj.Selected = !obj.Selected;
-                        PlMain.Invalidate();
+                        this.PlMain.Invalidate();
                         return;
                     }
                 }
             }
-
-            foreach (var obj in lstObject)
+            else
             {
-                if (obj.Contains(e.Location) && btnSelect)
+                foreach (var obj in lstObject)
                 {
-                    foreach (var o in lstObject)
-                        o.Selected = false;
-
-                    obj.Selected = true;
-                    selectedObject = obj;
-
-                    // Kiểm tra resize
-                    if (Math.Abs(e.X - obj.p1.X) < 10 && Math.Abs(e.Y - obj.p1.Y) < 10)
+                    if (obj.Contains(e.Location) && btnSelect == true)
                     {
-                        isResizing = true;
-                        resizePoint = 1;
+                        foreach (var o in lstObject)
+                            o.Selected = false;
+
+                        obj.Selected = true;
+                        selectedObject = obj;
+
+                        if (Math.Abs(e.X - obj.p1.X) < 10 && Math.Abs(e.Y - obj.p1.Y) < 10)
+                        {
+                            isResizing = true;
+                            resizePoint = 1;
+                            return;
+                        }
+                        else if (Math.Abs(e.X - obj.p2.X) < 10 && Math.Abs(e.Y - obj.p2.Y) < 10)
+                        {
+                            isResizing = true;
+                            resizePoint = 2;
+                            return;
+                        }
+                        else
+                        {
+                            isResizing = false;
+                        }
+
+                        this.PlMain.Invalidate();
+                        return;
                     }
-                    else if (Math.Abs(e.X - obj.p2.X) < 10 && Math.Abs(e.Y - obj.p2.Y) < 10)
+                }
+
+                selectedObject = null;
+                myCurrentObject = null;
+
+                if (index == 1)
+                    myCurrentObject = new clsLine();
+                else if (index == 2)
+                    myCurrentObject = new clsRectangle();
+                else if (index == 3)
+                    myCurrentObject = new clsEllipse();
+                else if (index == 4)
+                    myCurrentObject = new clsSquare();
+                else if (index == 5)
+                    myCurrentObject = new clsCircle();
+                else if (index == 6)
+                    myCurrentObject = new clsCurve(e.Location, e.Location, e.Location);
+                else if (index == 7)
+                    myCurrentObject = null;
+
+                if (myCurrentObject != null)
+                {
+                    myCurrentObject.myPen.Color = mycolor;
+                    myCurrentObject.myPen.Width = myThickness;
+                    myCurrentObject.myPen.DashStyle = penStyle;
+
+                    if (mySelectedStyle.HasValue)
                     {
-                        isResizing = true;
-                        resizePoint = 2;
+                        myCurrentObject.myBrush = new HatchBrush(mySelectedStyle.Value, brushFillColor, brushStrokeColor);
                     }
                     else
                     {
-                        isResizing = false;
+                        myCurrentObject.myBrush = new SolidBrush(brushFillColor);
                     }
 
-                    PlMain.Invalidate();
-                    return;
+                    myCurrentObject.p1 = e.Location;
+                    myCurrentObject.p2 = e.Location;
                 }
             }
-
-            // Không chọn object nào thì tạo object mới
-            selectedObject = null;
-            myCurrentObject = null;
-
-            switch (index)
-            {
-                case 1: myCurrentObject = new clsLine(); break;
-                case 2: myCurrentObject = new clsRectangle(); break;
-                case 3: myCurrentObject = new clsEllipse(); break;
-                case 4: myCurrentObject = new clsSquare(); break;
-                case 5: myCurrentObject = new clsCircle(); break;
-                case 6: myCurrentObject = new clsCurve(e.Location, e.Location, e.Location); break;
-                default: myCurrentObject = null; break;
-            }
-
-            if (myCurrentObject != null)
-            {
-                myCurrentObject.myPen.Color = mycolor;
-                myCurrentObject.myPen.Width = myThickness;
-                myCurrentObject.myPen.DashStyle = penStyle;
-
-                myCurrentObject.myBrush = mySelectedStyle.HasValue
-                    ? new HatchBrush(mySelectedStyle.Value, brushFillColor, brushStrokeColor)
-                    : new SolidBrush(brushFillColor);
-
-                myCurrentObject.p1 = e.Location;
-                myCurrentObject.p2 = e.Location;
-            }
-
-            PlMain.Invalidate();
-
-        }
-
-        selectedObject = null;
-        myCurrentObject = null;
-
-        switch (index)
-        {
-            case 1:
-                myCurrentObject = new clsLine();
-                break;
-            case 2:
-                myCurrentObject = new clsRectangle();
-                break;
-            case 3:
-                myCurrentObject = new clsEllipse();
-                break;
-            case 4:
-                myCurrentObject = new clsSquare();
-                break;
-            case 5:
-                myCurrentObject = new clsCircle();
-                break;
-            case 6:
-                myCurrentObject = new clsCurve(e.Location, e.Location, e.Location);
-                break;
-            default:
-                myCurrentObject = null;
-                break;
-        }
-
-
-            if (myCurrentObject != null)
-            {
-                myCurrentObject.myPen.Color = mycolor;
-                myCurrentObject.myPen.Width = myThickness;
-                myCurrentObject.myPen.DashStyle = penStyle;
-
-                myCurrentObject.myBrush = mySelectedStyle.HasValue
-                    ? new HatchBrush(mySelectedStyle.Value, brushFillColor, brushStrokeColor)
-                    : new SolidBrush(brushFillColor);
-
-                myCurrentObject.p1 = e.Location;
-                myCurrentObject.p2 = e.Location;
-            }
-
-            PlMain.Invalidate();
-
-        }
+            this.PlMain.Invalidate();
+        }      
 
         private void PlMain_Paint(object sender, PaintEventArgs e)
         {
